@@ -3,11 +3,11 @@
 	<name>JEA - DPE</name>
 	<author>Sylvain Philip</author>
 	<creationDate>april 2012</creationDate>
-	<copyright>Copyright (C) 2012 Sylvain Philip.</copyright>
-	<license>http://www.gnu.org/licenses/gpl-2.0.html GNU/GPL</license>
+	<copyright>Copyright (C) 2007 - 2019 Sylvain Philip.</copyright>
+	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
 	<authorEmail>contact@sphilip.com</authorEmail>
 	<authorUrl>www.sphilip.com</authorUrl>
-	<version>2.3</version>
+	<version>2.4</version>
 	<description>«Diagnostic de Performance Energetique» (energy efficiency) report in property detail.</description>
 
 	<scriptfile>script.php</scriptfile>
