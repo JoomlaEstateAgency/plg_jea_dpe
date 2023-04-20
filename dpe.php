@@ -6,10 +6,37 @@
  * @copyright   Copyright (C) 2007 - 2019 PHILIP Sylvain. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
+
+use Joomla\CMS\Factory;
+use Joomla\CMS\Uri\Uri;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Plugin\CMSPlugin;
+use Joomla\Event\SubscriberInterface;
+use Joomla\CMS\Application\WebApplication;
+use Joomla\CMS\Event\Table\AbstractEvent;
+use Joomla\Event\Event;
+
 defined('_JEXEC') or die;
 
-class PlgJeaDpe extends JPlugin
+class PlgJeaDpe extends CMSPlugin implements SubscriberInterface
 {
+	/**
+	 * Returns an array of events this subscriber will listen to.
+	 *
+	 * @return  array
+	 *
+	 * @since   4.1.3
+	 */
+	public static function getSubscribedEvents(): array
+	{
+		return [
+			'onBeforeSaveProperty' => 'onBeforeSaveProperty',
+			'onBeforeEndPanels' => 'onBeforeEndPanels',
+			'onAfterShowDescription' => 'onAfterShowDescription',
+		];
+	}
+
 	/**
 	 * @var string
 	 */
@@ -24,11 +51,15 @@ class PlgJeaDpe extends JPlugin
 	 *
 	 * @return boolean  True on success
 	 */
-	public function onBeforeSaveProperty($namespace, $row, $is_new)
+	public function onBeforeSaveProperty(Event $event)
 	{
-		$app = JFactory::getApplication();
+		$arguments = $event->getArguments();
+		$row = $arguments[1];
+		assert($row instanceof TableProperty);
 
-		if ($app instanceof \Joomla\CMS\Application\WebApplication)
+		$app = Factory::getApplication();
+
+		if ($app instanceof WebApplication)
 		{
 			$input = $app->input;
 
@@ -50,8 +81,11 @@ class PlgJeaDpe extends JPlugin
 	 *
 	 * @return void
 	 */
-	public function onBeforeEndPanels(&$row)
+	public function onBeforeEndPanels(Event $event)
 	{
+		$arguments = $event->getArguments();
+		$row = $arguments[0];
+
 		if ($row->dpe_energy === null)
 		{
 			$row->dpe_energy = '-1';
@@ -62,26 +96,34 @@ class PlgJeaDpe extends JPlugin
 			$row->dpe_ges = '-1';
 		}
 
-		$energyLabel = JText::_('PLG_JEA_DPE_ENERGY_CONSUMPTION');
-		$energyDesc = $energyLabel . '::' . JText::_('PLG_JEA_DPE_ENERGY_CONSUMPTION_DESC');
-		$gesLabel = JText::_('PLG_JEA_DPE_EMISSIONS_GES');
-		$gesDesc = $gesLabel . '::' . JText::_('PLG_JEA_DPE_EMISSIONS_GES_DESC');
+		$energyLabel = Text::_('PLG_JEA_DPE_ENERGY_CONSUMPTION');
+		$energyDesc = $energyLabel . '::' . Text::_('PLG_JEA_DPE_ENERGY_CONSUMPTION_DESC');
+		$gesLabel = Text::_('PLG_JEA_DPE_EMISSIONS_GES');
+		$gesDesc = $gesLabel . '::' . Text::_('PLG_JEA_DPE_EMISSIONS_GES_DESC');
 
-		echo JHtml::_('sliders.panel', JText::_('PLG_JEA_DPE'), 'dpe-pane');
+		echo HTMLHelper::_('bootstrap.addSlide', 'property-sliders', Text::_('PLG_JEA_DPE'), 'dpe-pane');
 
 		echo '
         <fieldset class="panelform">
-          <ul class="adminformlist">
-            <li>
+          <div class="control-group">
+            <div class="control-label">
               <label for="dpe_energy" class="hasTip" title="' . $energyDesc . '">' . $energyLabel . ' : </label>
-              <input type="text" name="dpe_energy" id="dpe_energy" value="' . $row->dpe_energy . '" class="numberbox" size="5" />
-            </li>
-            <li>
+            </div>
+            <div class="controls">
+              <input type="number" name="dpe_energy" id="dpe_energy" value="' . $row->dpe_energy . '" class="form-control numberbox" />
+            </div>
+		  </div>
+		  <div class="control-group">
+		    <div class="control-label">
               <label for="dpe_ges" class="hasTip" title="' . $gesDesc . '">' . $gesLabel . ' : </label>
-              <input type="text" name="dpe_ges" id="dpe_ges" value="' . $row->dpe_ges . '" class="numberbox" size="5" />
-            </li>
-           </ul>
+            </div>
+			<div class="controls">
+			  <input type="number" name="dpe_ges" id="dpe_ges" value="' . $row->dpe_ges . '" class="form-control numberbox" />
+			</div>
+           </div>
          </fieldset>';
+
+		 echo HTMLHelper::_('bootstrap.endSlide');
 	}
 
 	/**
@@ -92,14 +134,17 @@ class PlgJeaDpe extends JPlugin
 	 *
 	 * @return void
 	 */
-	public function onAfterShowDescription(&$row)
+	public function onAfterShowDescription(Event $event)
 	{
+		$arguments = $event->getArguments();
+		$row = $arguments[0];
+
 		if ($row->dpe_energy < 0 && $row->dpe_ges < 0)
 		{
 			return;
 		}
 
-		echo '<h3 class="jea_dpe">' . JText::_('PLG_JEA_DPE') . '</h3>' . PHP_EOL;
+		echo '<h3 class="jea_dpe">' . Text::_('PLG_JEA_DPE') . '</h3>' . PHP_EOL;
 		echo '<div class="jea_dpe">' . PHP_EOL;
 
 		if ($row->dpe_energy >= 0)
@@ -107,7 +152,7 @@ class PlgJeaDpe extends JPlugin
 			try
 			{
 				$img = $this->generateEnergyImage($row->dpe_energy);
-				echo '<img src="' . $img . '" alt="' . JText::_('PLG_JEA_DPE_ENERGY_CONSUMPTION') . '" style="margin-right: 50px;" />';
+				echo '<img src="' . $img . '" alt="' . Text::_('PLG_JEA_DPE_ENERGY_CONSUMPTION') . '" style="margin-right: 50px;" />';
 			}
 			catch (Exception $e)
 			{
@@ -120,7 +165,7 @@ class PlgJeaDpe extends JPlugin
 			try
 			{
 				$img = $this->generateGESImage($row->dpe_ges);
-				echo '<img src="' . $img . '" alt="' . JText::_('PLG_JEA_DPE_EMISSIONS_GES') . '" />';
+				echo '<img src="' . $img . '" alt="' . Text::_('PLG_JEA_DPE_EMISSIONS_GES') . '" />';
 			}
 			catch (Exception $e)
 			{
@@ -131,21 +176,27 @@ class PlgJeaDpe extends JPlugin
 		echo '</div>' . PHP_EOL;
 	}
 
+	private function getLanguageTag()
+	{
+		$app = Factory::getApplication();
+		assert($app instanceof WebApplication);
+
+		return $app->getLanguage()->getTag();
+	}
+
 	private function generateEnergyImage($energy = 0)
 	{
-		$lang = JFactory::getLanguage();
-		$tag = $lang->getTag();
+		$tag = $this->getLanguageTag();
 		$imagePath = JPATH_ROOT . '/images/com_jea/dpe/energy-' . $tag . '-' . $energy . '.png';
-		$uri = JFactory::getUri();
-		$imageURL = $uri->root(true) . '/images/com_jea/dpe/energy-' . $tag . '-' . $energy . '.png';
+		$imageURL = Uri::root(true) . '/images/com_jea/dpe/energy-' . $tag . '-' . $energy . '.png';
 
 		if (!file_exists($imagePath))
 		{
 			$levels = array(50, 90, 150, 230, 330, 450);
 			$labels = array(
-				'measure' => JText::_('PLG_JEA_DPE_ENERGY_MEASURE'),
-				'top-left' => JText::_('PLG_JEA_DPE_ENERGY_TOP_LEFT_LABEL'),
-				'bottom-left' => JText::_('PLG_JEA_DPE_ENERGY_BOTTOM_LEFT_LABEL')
+				'measure' => Text::_('PLG_JEA_DPE_ENERGY_MEASURE'),
+				'top-left' => Text::_('PLG_JEA_DPE_ENERGY_TOP_LEFT_LABEL'),
+				'bottom-left' => Text::_('PLG_JEA_DPE_ENERGY_BOTTOM_LEFT_LABEL')
 			);
 
 			$this->generateGDImage($energy, $imagePath, 'dpe-energy.png', $levels, $labels);
@@ -156,19 +207,17 @@ class PlgJeaDpe extends JPlugin
 
 	private function generateGESImage ($ges = 0)
 	{
-		$lang = JFactory::getLanguage();
-		$tag = $lang->getTag();
+		$tag = $this->getLanguageTag();
 		$imagePath = JPATH_ROOT . '/images/com_jea/dpe/ges-' . $tag . '-' . $ges . '.png';
-		$uri = JFactory::getUri();
-		$imageURL = $uri->root(true) . '/images/com_jea/dpe/ges-' . $tag . '-' . $ges . '.png';
+		$imageURL = Uri::root(true) . '/images/com_jea/dpe/ges-' . $tag . '-' . $ges . '.png';
 
 		if (!file_exists($imagePath))
 		{
 			$levels = array(5, 10, 20, 35, 55, 80);
 			$labels = array(
-				'measure' => JText::_('PLG_JEA_DPE_GES_MEASURE'),
-				'top-left' => JText::_('PLG_JEA_DPE_GES_TOP_LEFT_LABEL'),
-				'bottom-left' => JText::_('PLG_JEA_DPE_GES_BOTTOM_LEFT_LABEL')
+				'measure' => Text::_('PLG_JEA_DPE_GES_MEASURE'),
+				'top-left' => Text::_('PLG_JEA_DPE_GES_TOP_LEFT_LABEL'),
+				'bottom-left' => Text::_('PLG_JEA_DPE_GES_BOTTOM_LEFT_LABEL')
 			);
 
 			$this->generateGDImage($ges, $imagePath, 'dpe-ges.png', $levels, $labels);
@@ -270,7 +319,7 @@ class PlgJeaDpe extends JPlugin
 		}
 
 		// Add text to top right
-		imagettftext($img, 8, 0, 230, 9, $grey2, $fontFile, JText::_('PLG_JEA_DPE_TOP_RIGHT_LABEL'));
+		imagettftext($img, 8, 0, 230, 9, $grey2, $fontFile, Text::_('PLG_JEA_DPE_TOP_RIGHT_LABEL'));
 
 		// Add text to bottom left
 		if (isset($labels['bottom-left']))

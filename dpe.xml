@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<extension version="2.5" type="plugin" group="jea" method="upgrade">
+<extension type="plugin" group="jea" method="upgrade">
 	<name>JEA - DPE</name>
 	<author>Sylvain Philip</author>
 	<creationDate>april 2012</creationDate>
-	<copyright>Copyright (C) 2007 - 2019 Sylvain Philip.</copyright>
+	<copyright>Copyright (C) 2007 - 2023 Sylvain Philip.</copyright>
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
 	<authorEmail>contact@sphilip.com</authorEmail>
 	<authorUrl>www.sphilip.com</authorUrl>
-	<version>2.4</version>
+	<version>3.0</version>
 	<description>«Diagnostic de Performance Energetique» (energy efficiency) report in property detail.</description>
 
 	<scriptfile>script.php</scriptfile>
@@ -16,12 +16,8 @@
 		<filename plugin="dpe">dpe.php</filename>
 		<folder>fonts</folder>
 		<folder>images</folder>
+		<folder>language</folder>
 	</files>
-
-	<languages>
-		<language tag="en-GB">en-GB.plg_jea_dpe.ini</language>
-		<language tag="fr-FR">fr-FR.plg_jea_dpe.ini</language>
-	</languages>
 
 	<!-- Updateserver definition -->
 	<updateservers>
