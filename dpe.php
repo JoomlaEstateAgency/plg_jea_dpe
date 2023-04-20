@@ -9,13 +9,12 @@
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Uri\Uri;
+use Joomla\Event\Event;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Plugin\CMSPlugin;
 use Joomla\Event\SubscriberInterface;
 use Joomla\CMS\Application\WebApplication;
-use Joomla\CMS\Event\Table\AbstractEvent;
-use Joomla\Event\Event;
 
 defined('_JEXEC') or die;
 
@@ -45,9 +44,7 @@ class PlgJeaDpe extends CMSPlugin implements SubscriberInterface
 	/**
 	 * onBeforeSaveProperty method
 	 *
-	 * @param  string         $namespace  The form namespace
-	 * @param  TableProperty  $row        The property Db row instance
-	 * @param  boolean        $is_new     True if the property is new
+	 * @param  Event  $event  The subscribed event
 	 *
 	 * @return boolean  True on success
 	 */
@@ -77,7 +74,7 @@ class PlgJeaDpe extends CMSPlugin implements SubscriberInterface
 	 * onBeforeEndPane method
 	 * Called in the admin property form
 	 *
-	 * @param  TableProperty  $row  The property Db row instance
+	 * @param  Event  $event  The subscribed event
 	 *
 	 * @return void
 	 */
@@ -112,16 +109,16 @@ class PlgJeaDpe extends CMSPlugin implements SubscriberInterface
             <div class="controls">
               <input type="number" name="dpe_energy" id="dpe_energy" value="' . $row->dpe_energy . '" class="form-control numberbox" />
             </div>
-		  </div>
-		  <div class="control-group">
-		    <div class="control-label">
+          </div>
+          <div class="control-group">
+            <div class="control-label">
               <label for="dpe_ges" class="hasTip" title="' . $gesDesc . '">' . $gesLabel . ' : </label>
             </div>
-			<div class="controls">
-			  <input type="number" name="dpe_ges" id="dpe_ges" value="' . $row->dpe_ges . '" class="form-control numberbox" />
-			</div>
-           </div>
-         </fieldset>';
+            <div class="controls">
+              <input type="number" name="dpe_ges" id="dpe_ges" value="' . $row->dpe_ges . '" class="form-control numberbox" />
+            </div>
+          </div>
+        </fieldset>';
 
 		 echo HTMLHelper::_('bootstrap.endSlide');
 	}
@@ -130,7 +127,7 @@ class PlgJeaDpe extends CMSPlugin implements SubscriberInterface
 	 * onAfterShowDescription method
 	 * Called in the default_item.php layout
 	 *
-	 * @param  TableProperty  $row  The property Db row instance
+	 * @param  Event  $event  The subscribed event
 	 *
 	 * @return void
 	 */
