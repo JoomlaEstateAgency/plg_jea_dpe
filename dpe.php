@@ -3,7 +3,7 @@
  * @package     Joomla.Plugin
  * @subpackage  Jea.Dpe
  *
- * @copyright   Copyright (C) 2007 - 2019 PHILIP Sylvain. All rights reserved.
+ * @copyright   Copyright (C) 2007 - 2023 PHILIP Sylvain. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
