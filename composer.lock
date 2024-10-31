@@ -1,0 +1,61 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "44ffe3a16ea543c5ae8365c54493eeb5",
+    "packages": [
+        {
+            "name": "lbigroupp/dpegenerator",
+            "version": "v3.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/rvaly/dpegenerator.git",
+                "reference": "80cdbf496db5a2e6ca6e3fbd1538aa4a37ee7f05"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/rvaly/dpegenerator/zipball/80cdbf496db5a2e6ca6e3fbd1538aa4a37ee7f05",
+                "reference": "80cdbf496db5a2e6ca6e3fbd1538aa4a37ee7f05",
+                "shasum": ""
+            },
+            "require": {
+                "ext-imagick": "*",
+                "ext-json": "*",
+                "php": "^8.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "LBIGroupDpeGenerator\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Romain VALY",
+                    "email": "r.valy@la-boite-immo.com"
+                }
+            ],
+            "description": "This package is use for generate French DPEG picture. This new DPEG is an evolution of ELAN law on 2021-07-01.",
+            "support": {
+                "issues": "https://github.com/rvaly/dpegenerator/issues",
+                "source": "https://github.com/rvaly/dpegenerator/tree/v3.1.2"
+            },
+            "time": "2024-10-16T12:47:09+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": [],
+    "plugin-api-version": "2.6.0"
+}

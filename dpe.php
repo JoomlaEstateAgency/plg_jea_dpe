@@ -148,7 +148,7 @@ class PlgJeaDpe extends CMSPlugin implements SubscriberInterface
 		{
 			try
 			{
-				$img = $this->generateEnergyImage($row->dpe_energy);
+				$img = $this->generateEnergyImage($row->dpe_energy, $row->dpe_ges, (int) $row->living_space);
 				echo '<img src="' . $img . '" alt="' . Text::_('PLG_JEA_DPE_ENERGY_CONSUMPTION') . '" style="margin-right: 50px;" />';
 			}
 			catch (Exception $e)
@@ -161,7 +161,7 @@ class PlgJeaDpe extends CMSPlugin implements SubscriberInterface
 		{
 			try
 			{
-				$img = $this->generateGESImage($row->dpe_ges);
+				$img = $this->generateGESImage($row->dpe_ges, $row->dpe_ges, (int) $row->living_space);
 				echo '<img src="' . $img . '" alt="' . Text::_('PLG_JEA_DPE_EMISSIONS_GES') . '" />';
 			}
 			catch (Exception $e)
@@ -181,158 +181,58 @@ class PlgJeaDpe extends CMSPlugin implements SubscriberInterface
 		return $app->getLanguage()->getTag();
 	}
 
-	private function generateEnergyImage($energy = 0)
+	private function generateEnergyImage($energy = 0, $ges = 0, $superficie = 0)
 	{
+		require __DIR__ . '/vendor/autoload.php';
+
+		$type = LBIGroupDpeGenerator\DpeGenerator::DPE_TYPE;
+
 		$tag = $this->getLanguageTag();
 		$imagePath = JPATH_ROOT . '/images/com_jea/dpe/energy-' . $tag . '-' . $energy . '.png';
 		$imageURL = Uri::root(true) . '/images/com_jea/dpe/energy-' . $tag . '-' . $energy . '.png';
 
 		if (!file_exists($imagePath))
 		{
-			$levels = array(50, 90, 150, 230, 330, 450);
-			$labels = array(
-				'measure' => Text::_('PLG_JEA_DPE_ENERGY_MEASURE'),
-				'top-left' => Text::_('PLG_JEA_DPE_ENERGY_TOP_LEFT_LABEL'),
-				'bottom-left' => Text::_('PLG_JEA_DPE_ENERGY_BOTTOM_LEFT_LABEL')
-			);
-
-			$this->generateGDImage($energy, $imagePath, 'dpe-energy.png', $levels, $labels);
+			$dpe = new LBIGroupDpeGenerator\DpeGenerator();
+			$dpe->setDpeVal($energy);
+			$dpe->setGesVal($ges);
+			if ($superficie) $dpe->setSuperficie($superficie);
+			$dpe->setPictureType($type);
+			$dpe->setImageSize(LBIGroupDpeGenerator\DpeGenerator::WEB_SIZE_TYPE);
+			$dpe->setPathToWriteImage(JPATH_ROOT . '/images/com_jea/dpe/');
+			$dpe->setNameOfPicture('energy-' . $tag . '-' . $energy);
+			$dpe->setGenerateImage(true);
+			$dpe->generatePicture();
 		}
 
 		return $imageURL;
 	}
 
-	private function generateGESImage ($ges = 0)
+	private function generateGESImage ($energy = 0, $ges = 0, $superficie = 0)
 	{
+		require __DIR__ . '/vendor/autoload.php';
+
+		$type = LBIGroupDpeGenerator\DpeGenerator::GES_TYPE;
+
 		$tag = $this->getLanguageTag();
 		$imagePath = JPATH_ROOT . '/images/com_jea/dpe/ges-' . $tag . '-' . $ges . '.png';
 		$imageURL = Uri::root(true) . '/images/com_jea/dpe/ges-' . $tag . '-' . $ges . '.png';
 
 		if (!file_exists($imagePath))
 		{
-			$levels = array(5, 10, 20, 35, 55, 80);
-			$labels = array(
-				'measure' => Text::_('PLG_JEA_DPE_GES_MEASURE'),
-				'top-left' => Text::_('PLG_JEA_DPE_GES_TOP_LEFT_LABEL'),
-				'bottom-left' => Text::_('PLG_JEA_DPE_GES_BOTTOM_LEFT_LABEL')
-			);
-
-			$this->generateGDImage($ges, $imagePath, 'dpe-ges.png', $levels, $labels);
+			$dpe = new LBIGroupDpeGenerator\DpeGenerator();
+			$dpe->setDpeVal($energy);
+			$dpe->setGesVal($ges);
+			if ($superficie) $dpe->setSuperficie($superficie);
+			$dpe->setPictureType($type);
+			$dpe->setImageSize(LBIGroupDpeGenerator\DpeGenerator::WEB_SIZE_TYPE);
+			$dpe->setPathToWriteImage(JPATH_ROOT . '/images/com_jea/dpe/');
+			$dpe->setNameOfPicture('ges-' . $tag . '-' . $ges);
+			$dpe->setGenerateImage(true);
+			$dpe->generatePicture();
 		}
+
 
 		return $imageURL;
-	}
-
-	private function generateGDImage ($dpeValue, $imagePath, $imageModel, $levels, $labels = array())
-	{
-		$currentLevel = 0;
-		$imgWidth = 300;
-		$imgHeiht = 260;
-		$fontFile = JPATH_ROOT . '/plugins/jea/dpe/fonts/DejaVuSans.ttf';
-		$fontBoldFile = JPATH_ROOT . '/plugins/jea/dpe/fonts/DejaVuSans-Bold.ttf';
-
-		foreach ($levels as $level => $value)
-		{
-			if ($dpeValue <= $value)
-			{
-				$currentLevel = $level;
-				break;
-			}
-		}
-
-		if ($currentLevel == 0 && $dpeValue > $levels[count($levels) - 1])
-		{
-			$currentLevel = 6;
-		}
-
-		$img = @imagecreatetruecolor($imgWidth, $imgHeiht);
-
-		if (! $img)
-		{
-			throw new Exception('Cannot create a GD image stream');
-		}
-
-		$white = imagecolorallocate($img, 255, 255, 255);
-		$grey = imagecolorallocate($img, 200, 200, 200);
-		$grey2 = imagecolorallocate($img, 40, 40, 40);
-		imagefill($img, 0, 0, $white);
-		$arrowImg = @imagecreatefrompng(JPATH_ROOT . '/plugins/jea/dpe/images/arrow.png');
-		$imgModel = @imagecreatefrompng(JPATH_ROOT . '/plugins/jea/dpe/images/' . $imageModel);
-
-		// Where the img model start from Y
-		$destY = ceil(($imgHeiht - imagesy($imgModel)) / 2);
-
-		$dpeY = $destY;
-
-		if ($currentLevel == 6)
-		{
-			$dpeY += imagesy($imgModel) - 15;
-		}
-		else
-		{
-			/*
-			 * 30 px height per level + 3px margin
-			 * Adjust now y between the levels limits
-			 */
-			$dpeY += $currentLevel * 33;
-			$start = 0;
-			$end = $levels[$currentLevel];
-
-			if (isset($levels[$currentLevel - 1]))
-			{
-				$start = $levels[$currentLevel - 1] + 1;
-			}
-
-			$dpeY += floor(($dpeValue - $start) * 30 / ($end - $start));
-		}
-
-		// Draw horizontal line
-		imageline($img, 0, $dpeY, $imgWidth, $dpeY, $grey);
-
-		// Draw vertical line
-		imageline($img, 220, 0, 220, $imgHeiht, $grey2);
-
-		// Copy the image model
-		imagecopy($img, $imgModel, 0, $destY, 0, 0, imagesx($imgModel), imagesy($imgModel));
-		$destX = $imgWidth - imagesx($arrowImg);
-		$destY = $dpeY - (imagesy($arrowImg) / 2);
-		imagecopy($img, $arrowImg, $destX, $destY, 0, 0, imagesx($arrowImg), imagesy($arrowImg));
-
-		// Add the value
-		imagettftext($img, 11, 0, $destX + 18, $destY + 20, $white, $fontBoldFile, $dpeValue);
-
-		// Add the measure
-		if (isset($labels['measure']))
-		{
-			$box = imagettfbbox(7, 0, $fontFile, $labels['measure']);
-			$x = $box[4] - $box[0];
-			imagettftext($img, 7, 0, $imgWidth - $x, $destY + 41, $grey2, $fontFile, $labels['measure']);
-		}
-
-		// Add text to top left
-		if (isset($labels['top-left']))
-		{
-			imagettftext($img, 8, 0, 0, 9, $grey2, $fontFile, $labels['top-left']);
-		}
-
-		// Add text to top right
-		imagettftext($img, 8, 0, 230, 9, $grey2, $fontFile, Text::_('PLG_JEA_DPE_TOP_RIGHT_LABEL'));
-
-		// Add text to bottom left
-		if (isset($labels['bottom-left']))
-		{
-			imagettftext($img, 8, 0, 0, $imgHeiht - 3, $grey2, $fontFile, $labels['bottom-left']);
-		}
-
-		$ret = @imagepng($img, $imagePath);
-
-		imagedestroy($img);
-		imagedestroy($arrowImg);
-		imagedestroy($imgModel);
-
-		if (!$ret)
-		{
-			throw new Exception('Cannot save image : ' . $imagePath);
-		}
 	}
 }
