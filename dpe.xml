@@ -7,15 +7,13 @@
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
 	<authorEmail>contact@sphilip.com</authorEmail>
 	<authorUrl>www.sphilip.com</authorUrl>
-	<version>3.0</version>
+	<version>4.0</version>
 	<description>«Diagnostic de Performance Energetique» (energy efficiency) report in property detail.</description>
 
 	<scriptfile>script.php</scriptfile>
 
 	<files>
 		<filename plugin="dpe">dpe.php</filename>
-		<folder>fonts</folder>
-		<folder>images</folder>
 		<folder>language</folder>
 	</files>
 
